@@ -45,7 +45,12 @@ public class MagicCounter implements Counter {
 
     @Override
     public long getValue() {
-        return value;
+        lock();
+        try {
+            return value;
+        } finally {
+            unlock();
+        }
     }
 
     private boolean checkConflictExistence(int i, int me) {

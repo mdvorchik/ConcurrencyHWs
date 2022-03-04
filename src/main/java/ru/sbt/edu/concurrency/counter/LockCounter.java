@@ -19,6 +19,11 @@ public class LockCounter implements Counter {
 
     @Override
     public long getValue() {
-        return value;
+        lock.lock();
+        try {
+            return value;
+        } finally {
+            lock.unlock();
+        }
     }
 }

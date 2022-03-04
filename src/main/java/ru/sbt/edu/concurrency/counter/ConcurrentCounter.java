@@ -20,6 +20,14 @@ public class ConcurrentCounter implements Counter {
 
     @Override
     public long getValue() {
-        return value;
+        try {
+            semaphore.acquire();
+            return value;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return -1;
+        } finally {
+            semaphore.release();
+        }
     }
 }
