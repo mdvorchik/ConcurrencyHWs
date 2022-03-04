@@ -21,9 +21,9 @@ public class ILockTest {
 
     @Test
     public void testNaiveCounter()  {
-        Counter counter = new ConcurrentCounter();
+        Counter counter = new MagicCounter();
 
-        testCounter(counter, 1000);
+        testCounter(counter, 10000);
     }
 
     private void testCounter(Counter counter, int iters) {

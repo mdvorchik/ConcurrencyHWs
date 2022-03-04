@@ -2,24 +2,27 @@ package ru.sbt.edu.concurrency.counter;
 
 import ru.sbt.edu.concurrency.util.ThreadID;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 public class MagicCounter implements Counter {
-    private final int[] level = new int[Runtime.getRuntime().availableProcessors()];
-    private final int[] victim = new int[Runtime.getRuntime().availableProcessors()];
+    private final List<Integer> level = new CopyOnWriteArrayList<>();
+    private final List<Integer> victim = new CopyOnWriteArrayList<>();
     private long value;
 
     public MagicCounter() {
-        for (int i = 0; i < level.length; i++) {
-            level[i] = 0;
-            victim[i] = 0;
+        for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
+            level.add(0);
+            victim.add(0);
         }
     }
 
     //filter lock
     public void lock() {
         int me = ThreadID.get();
-        for (int i = 1; i < level.length; i++) {
-            level[me] = i;
-            victim[i] = me;
+        for (int i = 1; i < level.size(); i++) {
+            level.set(me, i);
+            victim.set(i, me);
             while (checkConflictExistence(i, me)) {
             }
         }
@@ -27,7 +30,7 @@ public class MagicCounter implements Counter {
 
     public void unlock() {
         int me = ThreadID.get();
-        level[me] = 0;
+        level.set(me, 0);
     }
 
     @Override
@@ -46,8 +49,8 @@ public class MagicCounter implements Counter {
     }
 
     private boolean checkConflictExistence(int i, int me) {
-        for (int k = 0; k < level.length; k++) {
-            if (k != me && (level[k] >= i && victim[i] == me)) {
+        for (int k = 0; k < level.size(); k++) {
+            if (k != me && (level.get(k) >= i && victim.get(i) == me)) {
                 return true;
             }
         }
